@@ -34,9 +34,10 @@
         }
         .photo-preview {
             display: flex;
-            overflow-x: auto;
+            overflow-x: scroll;
             gap: 10px;
             scroll-snap-type: x mandatory;
+            margin-bottom: 20px;
         }
         .photo-preview img {
             width: 100%;
@@ -60,6 +61,18 @@
         }
         .dots .active {
             background-color: #007BFF;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .section input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
         }
         .hidden {
             display: none;
