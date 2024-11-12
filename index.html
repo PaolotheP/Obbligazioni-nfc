@@ -1,94 +1,169 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coccolotto NFC - Messaggio Speciale</title>
+    <title>Pagina NFC Interattiva</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-
         body {
-            font-family: 'Pacifico', cursive;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: url('IMG_0119.jpg'); /* Assicurati che il file sia nella stessa cartella */
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 600px;
-            background-color: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            text-align: center;
         }
-
-        .main-image {
-            width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-            border-radius: 10px;
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .section {
             margin-bottom: 20px;
         }
-
-        .audio-section {
-            margin: 20px 0;
+        .section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
-
-        .text-section {
-            color: #000;
-            font-size: 22px;
-            line-height: 1.6;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(216, 27, 96, 0.1);
-        }
-
-        audio {
+        .section input[type="file"],
+        .section textarea {
             width: 100%;
-            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
         }
-
-        @media (max-width: 768px) {
-            .text-section {
-                font-size: 18px;
-            }
-
-            .main-image {
-                max-height: 200px;
-            }
+        .scrollable-textarea {
+            height: 100px;
+            overflow-y: scroll;
+        }
+        .add-button {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .audio-preview {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .audio-preview audio {
+            width: 100%;
+        }
+        .dots {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #ccc;
+            border-radius: 50%;
+            margin: 0 2px;
+        }
+        .dots .active {
+            background-color: #007BFF;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Immagine principale -->
-        <img src="screen_i&m.png" alt="Indicatore Inizio" class="main-image">
-
-        <!-- Sezione audio -->
-        <div class="audio-section">
-            <audio controls>
-                <source src="audio.mp3" type="audio/mpeg">
-                Il tuo browser non supporta l'elemento audio.
-            </audio>
+        <button class="header-button" onclick="addBackground()">+</button>
+        <div class="section">
+            <label for="photoInput">Add photo/video</label>
+            <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
+            <div id="photoPreview" class="photo-preview"></div>
         </div>
-
-        <!-- Sezione del testo -->
-        <div class="text-section">
-            <p>“Ogni momento con te è un ricordo che custodisco nel cuore. Questo piccolo gesto è per ricordarti quanto sei speciale e quanto illumini la mia vita ogni giorno. Ti amo oltre le parole, sempre e per sempre.”</p>
+        <div class="dots">
+            <span class="active"></span><span></span><span></span>
+        </div>
+        <div class="section">
+            <label for="audioInput">Add audio</label>
+            <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
+            <div id="audioPreview" class="audio-preview"></div>
+        </div>
+        <div class="section">
+            <label>Add song</label>
+            <div class="add-button" onclick="addSong()">Add song</div>
+            <div id="songPreview"></div>
+        </div>
+        <div class="section">
+            <label for="textInput">Add text</label>
+            <textarea id="textInput" class="scrollable-textarea" placeholder="Write your text here..."></textarea>
         </div>
     </div>
-</body>
-</html>
-    </div>
+
+    <script>
+        function addBackground() {
+            alert('This feature allows you to select a background image.');
+            // Implement logic to change the background image of the container
+        }
+
+        function previewImages() {
+            const input = document.getElementById('photoInput');
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = ''; // Clear previous content
+
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = document.createElement('img');
+                    img.src = reader.result;
+                    img.style.width = '100%';
+                    img.style.marginBottom = '10px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function previewAudio() {
+            const input = document.getElementById('audioInput');
+            const preview = document.getElementById('audioPreview');
+            preview.innerHTML = ''; // Clear previous content
+
+            const file = input.files[0];
+            if (file) {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    audio.src = reader.result;
+                    preview.appendChild(audio);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addSong() {
+            const songContainer = document.getElementById('songPreview');
+            songContainer.innerHTML = '<p>Song feature coming soon...</p>';
+            // Implement logic to fetch and play songs from online sources
+        }
+    </script>
 </body>
 </html>
