@@ -34,7 +34,7 @@
         }
         .photo-preview {
             display: flex;
-            overflow-x: scroll;
+            overflow-x: auto;
             gap: 10px;
             scroll-snap-type: x mandatory;
             margin-bottom: 20px;
@@ -70,12 +70,37 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
-        .section input[type="file"] {
+        .section input[type="file"],
+        .section textarea {
             display: block;
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
             margin-bottom: 10px;
+        }
+        .audio-preview audio,
+        .song-preview audio {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .add-button {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
         }
         .hidden {
             display: none;
+        }
+        .formatting-options {
+            margin-bottom: 10px;
+        }
+        .formatting-options select, .formatting-options input {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -86,6 +111,31 @@
             <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
             <div id="photoPreview" class="photo-preview"></div>
             <div class="dots" id="photoDots"></div>
+        </div>
+        <div class="section" id="audioSection">
+            <label for="audioInput">Add audio</label>
+            <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
+            <div id="audioPreview" class="audio-preview"></div>
+        </div>
+        <div class="section" id="songSection">
+            <label>Add song</label>
+            <div class="add-button" onclick="addSong()">Add song</div>
+            <div id="songPreview" class="song-preview"></div>
+        </div>
+        <div class="section" id="textSection">
+            <label for="textInput">Add text</label>
+            <div class="formatting-options">
+                <select id="fontSelect">
+                    <option value="Roboto">Roboto</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
+                <input type="color" id="colorPicker" value="#000000">
+                <input type="number" id="fontSize" placeholder="Size" min="12" max="48" value="16">
+                <button onclick="applyFormatting()">Apply</button>
+            </div>
+            <textarea id="textInput" class="scrollable-textarea" placeholder="Write your text here..."></textarea>
         </div>
     </div>
 
@@ -128,6 +178,49 @@
                     dot.classList.toggle('active', i === activeIndex);
                 });
             });
+        }
+
+        function previewAudio() {
+            const input = document.getElementById('audioInput');
+            const preview = document.getElementById('audioPreview');
+            preview.innerHTML = ''; // Clear previous content
+
+            const file = input.files[0];
+            if (file) {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    audio.src = reader.result;
+                    preview.appendChild(audio);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Hide the input section after the audio is added
+            document.getElementById('audioSection').style.display = 'none';
+        }
+
+        function addSong() {
+            const songContainer = document.getElementById('songPreview');
+            songContainer.innerHTML = `<audio controls><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3"></audio>`;
+            
+            // Hide the input section after the song is added
+            document.getElementById('songSection').style.display = 'none';
+        }
+
+        function applyFormatting() {
+            const textarea = document.getElementById('textInput');
+            const font = document.getElementById('fontSelect').value;
+            const color = document.getElementById('colorPicker').value;
+            const size = document.getElementById('fontSize').value;
+
+            textarea.style.fontFamily = font;
+            textarea.style.color = color;
+            textarea.style.fontSize = size + 'px';
+
+            // Hide the text formatting section after formatting is applied
+            document.getElementById('textSection').style.display = 'none';
         }
     </script>
 </body>
