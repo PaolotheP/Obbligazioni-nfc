@@ -25,90 +25,29 @@
             border: 1px solid #000;
             position: relative;
         }
-        .header-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            cursor: pointer;
-            font-size: 20px;
-        }
-        .section {
+        .main-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 10px;
             margin-bottom: 20px;
-        }
-        .section label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        .section input[type="file"],
-        .section textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-        }
-        .scrollable-textarea {
-            height: 100px;
-            overflow-y: scroll;
-        }
-        .add-button {
-            background-color: #28a745;
-            color: #fff;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .audio-preview, .song-preview {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .audio-preview audio, .song-preview audio {
-            width: 100%;
         }
         .photo-preview {
             display: flex;
             overflow-x: auto;
             gap: 10px;
+            scroll-snap-type: x mandatory;
         }
         .photo-preview img {
-            max-height: 100px;
-            border-radius: 10px;
-        }
-        .background-preview {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .background-preview img {
             width: 100%;
-            border-radius: 15px;
-            opacity: 0.5;
-        }
-        .hidden {
-            display: none;
-        }
-        .formatting-options {
-            margin-bottom: 10px;
-        }
-        .formatting-options select, .formatting-options input {
-            margin-right: 10px;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 10px;
+            scroll-snap-align: start;
         }
         .dots {
             text-align: center;
-            margin: 10px 0;
+            margin-top: 10px;
         }
         .dots span {
             display: inline-block;
@@ -116,129 +55,66 @@
             height: 8px;
             background-color: #ccc;
             border-radius: 50%;
-            margin: 0 2px;
+            margin: 0 3px;
+            transition: background-color 0.3s;
         }
         .dots .active {
             background-color: #007BFF;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container" id="container">
-        <button class="header-button" id="backgroundButton" onclick="addBackground()">+</button>
-        <div class="background-preview" id="backgroundPreview"></div>
+    <div class="container">
         <div class="section" id="photoSection">
             <label for="photoInput">Add photo/video</label>
             <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
             <div id="photoPreview" class="photo-preview"></div>
-        </div>
-        <div class="dots" id="photoDots">
-            <span class="active"></span><span></span><span></span>
-        </div>
-        <div class="section" id="audioSection">
-            <label for="audioInput">Add audio</label>
-            <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
-            <div id="audioPreview" class="audio-preview"></div>
-        </div>
-        <div class="section" id="songSection">
-            <label>Add song</label>
-            <div class="add-button" onclick="addSong()">Add song</div>
-            <div id="songPreview" class="song-preview"></div>
-        </div>
-        <div class="section" id="textSection">
-            <label for="textInput">Add text</label>
-            <div class="formatting-options">
-                <select id="fontSelect">
-                    <option value="Roboto">Roboto</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Poppins">Poppins</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                </select>
-                <input type="color" id="colorPicker" value="#000000">
-                <input type="number" id="fontSize" placeholder="Size" min="12" max="48" value="16">
-                <button onclick="applyFormatting()">Apply</button>
-            </div>
-            <textarea id="textInput" class="scrollable-textarea" placeholder="Write your text here..."></textarea>
+            <div class="dots" id="photoDots"></div>
         </div>
     </div>
 
     <script>
-        function addBackground() {
-            document.getElementById('backgroundButton').style.display = 'none';
-            document.getElementById('photoInput').click();
-            document.getElementById('photoInput').onchange = function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function() {
-                        const img = document.createElement('img');
-                        img.src = reader.result;
-                        document.getElementById('backgroundPreview').appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-        }
-
         function previewImages() {
             const input = document.getElementById('photoInput');
             const preview = document.getElementById('photoPreview');
+            const dotsContainer = document.getElementById('photoDots');
             preview.innerHTML = ''; // Clear previous content
+            dotsContainer.innerHTML = ''; // Clear previous dots
 
-            Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const img = document.createElement('img');
-                    img.src = reader.result;
-                    preview.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
+            const files = Array.from(input.files);
+            if (files.length > 0) {
+                files.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const img = document.createElement('img');
+                        img.src = reader.result;
+                        preview.appendChild(img);
 
-            hideSection('photoSection');
-        }
+                        // Add dot for each image
+                        const dot = document.createElement('span');
+                        dot.classList.add(index === 0 ? 'active' : '');
+                        dotsContainer.appendChild(dot);
+                    };
+                    reader.readAsDataURL(file);
+                });
 
-        function previewAudio() {
-            const input = document.getElementById('audioInput');
-            const preview = document.getElementById('audioPreview');
-            preview.innerHTML = ''; // Clear previous content
-
-            const file = input.files[0];
-            if (file) {
-                const audio = document.createElement('audio');
-                audio.controls = true;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    audio.src = reader.result;
-                    preview.appendChild(audio);
-                };
-                reader.readAsDataURL(file);
+                // Hide the input section after images are added
+                document.getElementById('photoSection').style.display = 'none';
             }
 
-            hideSection('audioSection');
-        }
+            // Set up dot navigation
+            preview.addEventListener('scroll', () => {
+                const scrollLeft = preview.scrollLeft;
+                const scrollWidth = preview.scrollWidth - preview.clientWidth;
+                const activeIndex = Math.round((scrollLeft / scrollWidth) * (files.length - 1));
 
-        function addSong() {
-            const songContainer = document.getElementById('songPreview');
-            songContainer.innerHTML = `<audio controls><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3"></audio>`;
-            hideSection('songSection');
-        }
-
-        function applyFormatting() {
-            const textarea = document.getElementById('textInput');
-            const font = document.getElementById('fontSelect').value;
-            const color = document.getElementById('colorPicker').value;
-            const size = document.getElementById('fontSize').value;
-
-            textarea.style.fontFamily = font;
-            textarea.style.color = color;
-            textarea.style.fontSize = size + 'px';
-
-            hideSection('textSection');
-        }
-
-        function hideSection(sectionId) {
-            document.getElementById(sectionId).style.display = 'none';
+                Array.from(dotsContainer.children).forEach((dot, i) => {
+                    dot.classList.toggle('active', i === activeIndex);
+                });
+            });
         }
     </script>
 </body>
