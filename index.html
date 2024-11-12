@@ -8,7 +8,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f0f0f0;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -22,15 +22,8 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            border: 1px solid #000;
+            border: 1px solid #ddd;
             position: relative;
-        }
-        .main-image {
-            width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 20px;
         }
         .photo-preview {
             display: flex;
@@ -40,10 +33,10 @@
             margin-bottom: 20px;
         }
         .photo-preview img {
-            width: 100%;
-            max-height: 500px;
+            width: 150px;
+            height: 100px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 20px;
             scroll-snap-align: start;
         }
         .dots {
@@ -68,7 +61,7 @@
         .section label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
+            font-weight: 500;
         }
         .section input[type="file"],
         .section textarea {
@@ -78,20 +71,33 @@
             border-radius: 10px;
             border: 1px solid #ccc;
             margin-bottom: 10px;
+            background-color: #f9f9f9;
         }
         .audio-preview audio,
         .song-preview audio {
             width: 100%;
             margin-bottom: 10px;
         }
+        .song-preview img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
         .add-button {
-            background-color: #28a745;
+            background-color: #007BFF;
             color: #fff;
             padding: 10px;
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
+            border: none;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .add-button:hover {
+            background-color: #0056b3;
         }
         .hidden {
             display: none;
@@ -99,7 +105,8 @@
         .formatting-options {
             margin-bottom: 10px;
         }
-        .formatting-options select, .formatting-options input {
+        .formatting-options select,
+        .formatting-options input {
             margin-right: 10px;
         }
     </style>
@@ -121,7 +128,7 @@
 
         <div class="section" id="songSection">
             <label>Add song</label>
-            <div class="add-button" onclick="addSong()">Add song</div>
+            <button class="add-button" onclick="selectSong()">Choose a song</button>
         </div>
         <div id="songPreview" class="song-preview"></div>
 
@@ -206,12 +213,21 @@
             input.style.display = 'none';
         }
 
-        function addSong() {
+        function selectSong() {
+            // Open a service or prompt to select a song (simulate for now)
+            alert('Select a song from an external service.');
+
+            // Example of adding a song cover and player after selection
             const songContainer = document.getElementById('songPreview');
-            songContainer.innerHTML = `<audio controls><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3"></audio>`;
-            
+            songContainer.innerHTML = `
+                <img src="https://via.placeholder.com/100" alt="Song Cover">
+                <audio controls>
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+                </audio>
+            `;
+
             // Hide only the add button, keep the content visible
-            document.getElementById('songSection').querySelector('.add-button').style.display = 'none';
+            document.getElementById('songSection').querySelector('button').style.display = 'none';
         }
 
         function applyFormatting() {
