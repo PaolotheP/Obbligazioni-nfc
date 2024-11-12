@@ -5,22 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagina NFC Interattiva</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
-            max-width: 500px;
-            margin: 0 auto;
+            width: 500px;
             background-color: #ffffff;
             border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             padding: 20px;
             border: 1px solid #000;
             position: relative;
-            overflow: hidden;
         }
         .header-button {
             position: absolute;
@@ -65,6 +68,7 @@
             text-align: center;
             cursor: pointer;
             font-weight: bold;
+            margin-top: 10px;
         }
         .audio-preview, .song-preview {
             display: flex;
@@ -82,6 +86,16 @@
         .photo-preview img {
             max-height: 100px;
             border-radius: 10px;
+        }
+        .background-preview {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .background-preview img {
+            width: 100%;
+            border-radius: 15px;
+            opacity: 0.5;
         }
         .hidden {
             display: none;
@@ -111,7 +125,8 @@
 </head>
 <body>
     <div class="container" id="container">
-        <button class="header-button" onclick="addBackground()">+</button>
+        <button class="header-button" id="backgroundButton" onclick="addBackground()">+</button>
+        <div class="background-preview" id="backgroundPreview"></div>
         <div class="section" id="photoSection">
             <label for="photoInput">Add photo/video</label>
             <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
@@ -134,6 +149,7 @@
             <label for="textInput">Add text</label>
             <div class="formatting-options">
                 <select id="fontSelect">
+                    <option value="Roboto">Roboto</option>
                     <option value="Arial">Arial</option>
                     <option value="Poppins">Poppins</option>
                     <option value="Times New Roman">Times New Roman</option>
@@ -148,15 +164,16 @@
 
     <script>
         function addBackground() {
+            document.getElementById('backgroundButton').style.display = 'none';
             document.getElementById('photoInput').click();
             document.getElementById('photoInput').onchange = function() {
                 const file = this.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function() {
-                        document.getElementById('container').style.backgroundImage = `url(${reader.result})`;
-                        document.getElementById('container').style.backgroundSize = 'cover';
-                        document.getElementById('container').style.backgroundPosition = 'center';
+                        const img = document.createElement('img');
+                        img.src = reader.result;
+                        document.getElementById('backgroundPreview').appendChild(img);
                     };
                     reader.readAsDataURL(file);
                 }
