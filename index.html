@@ -109,19 +109,22 @@
         <div class="section" id="photoSection">
             <label for="photoInput">Add photo/video</label>
             <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
-            <div id="photoPreview" class="photo-preview"></div>
-            <div class="dots" id="photoDots"></div>
         </div>
+        <div id="photoPreview" class="photo-preview"></div>
+        <div class="dots" id="photoDots"></div>
+
         <div class="section" id="audioSection">
             <label for="audioInput">Add audio</label>
             <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
-            <div id="audioPreview" class="audio-preview"></div>
         </div>
+        <div id="audioPreview" class="audio-preview"></div>
+
         <div class="section" id="songSection">
             <label>Add song</label>
             <div class="add-button" onclick="addSong()">Add song</div>
-            <div id="songPreview" class="song-preview"></div>
         </div>
+        <div id="songPreview" class="song-preview"></div>
+
         <div class="section" id="textSection">
             <label for="textInput">Add text</label>
             <div class="formatting-options">
@@ -164,8 +167,9 @@
                     reader.readAsDataURL(file);
                 });
 
-                // Hide the input section after images are added
-                input.parentElement.style.display = 'none';
+                // Hide only the input and label, keep the content visible
+                document.getElementById('photoSection').querySelector('label').style.display = 'none';
+                input.style.display = 'none';
             }
 
             // Set up dot navigation
@@ -197,16 +201,17 @@
                 reader.readAsDataURL(file);
             }
 
-            // Hide the input section after the audio is added
-            input.parentElement.style.display = 'none';
+            // Hide only the input and label, keep the content visible
+            document.getElementById('audioSection').querySelector('label').style.display = 'none';
+            input.style.display = 'none';
         }
 
         function addSong() {
             const songContainer = document.getElementById('songPreview');
             songContainer.innerHTML = `<audio controls><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3"></audio>`;
             
-            // Hide the input section after the song is added
-            document.getElementById('songSection').style.display = 'none';
+            // Hide only the add button, keep the content visible
+            document.getElementById('songSection').querySelector('.add-button').style.display = 'none';
         }
 
         function applyFormatting() {
@@ -219,8 +224,9 @@
             textarea.style.color = color;
             textarea.style.fontSize = size + 'px';
 
-            // Hide the text formatting section after formatting is applied
-            document.getElementById('textSection').style.display = 'none';
+            // Hide only the formatting options, keep the content visible
+            document.getElementById('textSection').querySelector('label').style.display = 'none';
+            document.getElementById('textSection').querySelector('.formatting-options').style.display = 'none';
         }
     </script>
 </body>
