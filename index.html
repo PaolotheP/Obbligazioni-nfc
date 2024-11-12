@@ -18,6 +18,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            border: 1px solid #000;
             position: relative;
             overflow: hidden;
         }
@@ -65,13 +66,31 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .audio-preview {
+        .audio-preview, .song-preview {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
-        .audio-preview audio {
+        .audio-preview audio, .song-preview audio {
             width: 100%;
+        }
+        .photo-preview {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+        }
+        .photo-preview img {
+            max-height: 100px;
+            border-radius: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .formatting-options {
+            margin-bottom: 10px;
+        }
+        .formatting-options select, .formatting-options input {
+            margin-right: 10px;
         }
         .dots {
             text-align: center;
@@ -91,36 +110,57 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <button class="header-button" onclick="addBackground()">+</button>
-        <div class="section">
+        <div class="section" id="photoSection">
             <label for="photoInput">Add photo/video</label>
             <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
             <div id="photoPreview" class="photo-preview"></div>
         </div>
-        <div class="dots">
+        <div class="dots" id="photoDots">
             <span class="active"></span><span></span><span></span>
         </div>
-        <div class="section">
+        <div class="section" id="audioSection">
             <label for="audioInput">Add audio</label>
             <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
             <div id="audioPreview" class="audio-preview"></div>
         </div>
-        <div class="section">
+        <div class="section" id="songSection">
             <label>Add song</label>
             <div class="add-button" onclick="addSong()">Add song</div>
-            <div id="songPreview"></div>
+            <div id="songPreview" class="song-preview"></div>
         </div>
-        <div class="section">
+        <div class="section" id="textSection">
             <label for="textInput">Add text</label>
+            <div class="formatting-options">
+                <select id="fontSelect">
+                    <option value="Arial">Arial</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
+                <input type="color" id="colorPicker" value="#000000">
+                <input type="number" id="fontSize" placeholder="Size" min="12" max="48" value="16">
+                <button onclick="applyFormatting()">Apply</button>
+            </div>
             <textarea id="textInput" class="scrollable-textarea" placeholder="Write your text here..."></textarea>
         </div>
     </div>
 
     <script>
         function addBackground() {
-            alert('This feature allows you to select a background image.');
-            // Implement logic to change the background image of the container
+            document.getElementById('photoInput').click();
+            document.getElementById('photoInput').onchange = function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        document.getElementById('container').style.backgroundImage = `url(${reader.result})`;
+                        document.getElementById('container').style.backgroundSize = 'cover';
+                        document.getElementById('container').style.backgroundPosition = 'center';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
         }
 
         function previewImages() {
@@ -133,12 +173,12 @@
                 reader.onload = () => {
                     const img = document.createElement('img');
                     img.src = reader.result;
-                    img.style.width = '100%';
-                    img.style.marginBottom = '10px';
                     preview.appendChild(img);
                 };
                 reader.readAsDataURL(file);
             });
+
+            hideSection('photoSection');
         }
 
         function previewAudio() {
@@ -157,12 +197,31 @@
                 };
                 reader.readAsDataURL(file);
             }
+
+            hideSection('audioSection');
         }
 
         function addSong() {
             const songContainer = document.getElementById('songPreview');
-            songContainer.innerHTML = '<p>Song feature coming soon...</p>';
-            // Implement logic to fetch and play songs from online sources
+            songContainer.innerHTML = `<audio controls><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3"></audio>`;
+            hideSection('songSection');
+        }
+
+        function applyFormatting() {
+            const textarea = document.getElementById('textInput');
+            const font = document.getElementById('fontSelect').value;
+            const color = document.getElementById('colorPicker').value;
+            const size = document.getElementById('fontSize').value;
+
+            textarea.style.fontFamily = font;
+            textarea.style.color = color;
+            textarea.style.fontSize = size + 'px';
+
+            hideSection('textSection');
+        }
+
+        function hideSection(sectionId) {
+            document.getElementById(sectionId).style.display = 'none';
         }
     </script>
 </body>
