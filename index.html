@@ -27,56 +27,31 @@
         }
         .photo-preview {
             display: flex;
-            overflow-x: auto;
-            gap: 10px;
-            scroll-snap-type: x mandatory;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 20px;
         }
         .photo-preview img {
-            width: 150px;
-            height: 100px;
+            width: 100%;
+            max-height: 400px;
             object-fit: cover;
             border-radius: 20px;
-            scroll-snap-align: start;
         }
-        .dots {
+        .photo-controls {
             text-align: center;
             margin-top: 10px;
         }
-        .dots span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #ccc;
-            border-radius: 50%;
-            margin: 0 3px;
-            transition: background-color 0.3s;
-        }
-        .dots .active {
+        .photo-controls button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: none;
             background-color: #007BFF;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        .section {
-            margin-bottom: 20px;
-        }
-        .section label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .section input[type="file"],
-        .section textarea {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            background-color: #f9f9f9;
-        }
-        .audio-preview audio,
-        .song-preview audio {
-            width: 100%;
-            margin-bottom: 10px;
+        .photo-controls button:hover {
+            background-color: #0056b3;
         }
         .song-preview img {
             width: 100px;
@@ -102,123 +77,80 @@
         .hidden {
             display: none;
         }
-        .formatting-options {
-            margin-bottom: 10px;
-        }
-        .formatting-options select,
-        .formatting-options input {
-            margin-right: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="section" id="photoSection">
-            <label for="photoInput">Add photo/video</label>
-            <input type="file" id="photoInput" accept="image/*,video/*" multiple onchange="previewImages()">
+            <label for="photoInput">Add photo</label>
+            <input type="file" id="photoInput" accept="image/*" multiple onchange="previewImages()">
         </div>
         <div id="photoPreview" class="photo-preview"></div>
-        <div class="dots" id="photoDots"></div>
-
-        <div class="section" id="audioSection">
-            <label for="audioInput">Add audio</label>
-            <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
+        <div class="photo-controls" id="photoControls" class="hidden">
+            <button onclick="prevImage()">Previous</button>
+            <button onclick="nextImage()">Next</button>
         </div>
-        <div id="audioPreview" class="audio-preview"></div>
 
         <div class="section" id="songSection">
             <label>Add song</label>
             <button class="add-button" onclick="selectSong()">Choose a song</button>
         </div>
         <div id="songPreview" class="song-preview"></div>
-
-        <div class="section" id="textSection">
-            <label for="textInput">Add text</label>
-            <div class="formatting-options">
-                <select id="fontSelect">
-                    <option value="Roboto">Roboto</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Poppins">Poppins</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                </select>
-                <input type="color" id="colorPicker" value="#000000">
-                <input type="number" id="fontSize" placeholder="Size" min="12" max="48" value="16">
-                <button onclick="applyFormatting()">Apply</button>
-            </div>
-            <textarea id="textInput" class="scrollable-textarea" placeholder="Write your text here..."></textarea>
-        </div>
     </div>
 
     <script>
+        let currentImageIndex = 0;
+        let imageFiles = [];
+
         function previewImages() {
             const input = document.getElementById('photoInput');
             const preview = document.getElementById('photoPreview');
-            const dotsContainer = document.getElementById('photoDots');
             preview.innerHTML = ''; // Clear previous content
-            dotsContainer.innerHTML = ''; // Clear previous dots
 
-            const files = Array.from(input.files);
-            if (files.length > 0) {
-                files.forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const img = document.createElement('img');
-                        img.src = reader.result;
-                        preview.appendChild(img);
-
-                        // Add dot for each image
-                        const dot = document.createElement('span');
-                        dot.classList.add(index === 0 ? 'active' : '');
-                        dotsContainer.appendChild(dot);
-                    };
-                    reader.readAsDataURL(file);
-                });
-
-                // Hide only the input and label, keep the content visible
+            imageFiles = Array.from(input.files);
+            if (imageFiles.length > 0) {
+                showImage(0);
+                document.getElementById('photoControls').style.display = 'block';
                 document.getElementById('photoSection').querySelector('label').style.display = 'none';
                 input.style.display = 'none';
             }
-
-            // Set up dot navigation
-            preview.addEventListener('scroll', () => {
-                const scrollLeft = preview.scrollLeft;
-                const scrollWidth = preview.scrollWidth - preview.clientWidth;
-                const activeIndex = Math.round((scrollLeft / scrollWidth) * (files.length - 1));
-
-                Array.from(dotsContainer.children).forEach((dot, i) => {
-                    dot.classList.toggle('active', i === activeIndex);
-                });
-            });
         }
 
-        function previewAudio() {
-            const input = document.getElementById('audioInput');
-            const preview = document.getElementById('audioPreview');
+        function showImage(index) {
+            const preview = document.getElementById('photoPreview');
             preview.innerHTML = ''; // Clear previous content
 
-            const file = input.files[0];
-            if (file) {
-                const audio = document.createElement('audio');
-                audio.controls = true;
+            if (imageFiles[index]) {
                 const reader = new FileReader();
                 reader.onload = () => {
-                    audio.src = reader.result;
-                    preview.appendChild(audio);
+                    const img = document.createElement('img');
+                    img.src = reader.result;
+                    preview.appendChild(img);
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(imageFiles[index]);
             }
+        }
 
-            // Hide only the input and label, keep the content visible
-            document.getElementById('audioSection').querySelector('label').style.display = 'none';
-            input.style.display = 'none';
+        function nextImage() {
+            if (currentImageIndex < imageFiles.length - 1) {
+                currentImageIndex++;
+                showImage(currentImageIndex);
+            }
+        }
+
+        function prevImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                showImage(currentImageIndex);
+            }
         }
 
         function selectSong() {
-            // Open a service or prompt to select a song (simulate for now)
+            const songContainer = document.getElementById('songPreview');
+            // Simulate a service to choose a song (e.g., YouTube/Spotify API)
             alert('Select a song from an external service.');
 
             // Example of adding a song cover and player after selection
-            const songContainer = document.getElementById('songPreview');
             songContainer.innerHTML = `
                 <img src="https://via.placeholder.com/100" alt="Song Cover">
                 <audio controls>
@@ -226,23 +158,7 @@
                 </audio>
             `;
 
-            // Hide only the add button, keep the content visible
             document.getElementById('songSection').querySelector('button').style.display = 'none';
-        }
-
-        function applyFormatting() {
-            const textarea = document.getElementById('textInput');
-            const font = document.getElementById('fontSelect').value;
-            const color = document.getElementById('colorPicker').value;
-            const size = document.getElementById('fontSize').value;
-
-            textarea.style.fontFamily = font;
-            textarea.style.color = color;
-            textarea.style.fontSize = size + 'px';
-
-            // Hide only the formatting options, keep the content visible
-            document.getElementById('textSection').querySelector('label').style.display = 'none';
-            document.getElementById('textSection').querySelector('.formatting-options').style.display = 'none';
         }
     </script>
 </body>
