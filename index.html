@@ -91,9 +91,15 @@
             <button onclick="nextImage()">Next</button>
         </div>
 
+        <div class="section" id="audioSection">
+            <label for="audioInput">Add audio</label>
+            <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
+        </div>
+        <div id="audioPreview" class="audio-preview"></div>
+
         <div class="section" id="songSection">
             <label>Add song</label>
-            <button class="add-button" onclick="selectSong()">Choose a song</button>
+            <input type="file" id="songInput" accept="audio/*" onchange="previewSong()">
         </div>
         <div id="songPreview" class="song-preview"></div>
     </div>
@@ -145,20 +151,50 @@
             }
         }
 
-        function selectSong() {
+        function previewAudio() {
+            const input = document.getElementById('audioInput');
+            const preview = document.getElementById('audioPreview');
+            preview.innerHTML = ''; // Clear previous content
+
+            const file = input.files[0];
+            if (file) {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    audio.src = reader.result;
+                    preview.appendChild(audio);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            document.getElementById('audioSection').querySelector('label').style.display = 'none';
+            input.style.display = 'none';
+        }
+
+        function previewSong() {
+            const input = document.getElementById('songInput');
             const songContainer = document.getElementById('songPreview');
-            // Simulate a service to choose a song (e.g., YouTube/Spotify API)
-            alert('Select a song from an external service.');
+            songContainer.innerHTML = ''; // Clear previous content
 
-            // Example of adding a song cover and player after selection
-            songContainer.innerHTML = `
-                <img src="https://via.placeholder.com/100" alt="Song Cover">
-                <audio controls>
-                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
-                </audio>
-            `;
+            const file = input.files[0];
+            if (file) {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    audio.src = reader.result;
+                    songContainer.appendChild(audio);
+                };
+                reader.readAsDataURL(file);
 
-            document.getElementById('songSection').querySelector('button').style.display = 'none';
+                const songCover = document.createElement('img');
+                songCover.src = 'https://via.placeholder.com/100'; // Placeholder for song cover
+                songContainer.insertBefore(songCover, audio);
+            }
+
+            document.getElementById('songSection').querySelector('label').style.display = 'none';
+            input.style.display = 'none';
         }
     </script>
 </body>
